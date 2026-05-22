@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 import tempfile
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates', static_folder='static')
 
 # Para Render: usar carpeta temporal si ARCHIVO_CSV no tiene path
 ARCHIVO_CSV = os.getenv("CSV_PATH", "clientes_bioenergy.csv")
