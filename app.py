@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file
 import csv
 import os
 from datetime import datetime
@@ -38,7 +38,24 @@ if not os.path.exists(ARCHIVO_CSV):
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    try:
+        # Intentar leer el archivo templates/index.html
+        with open(os.path.join('templates', 'index.html'), 'r', encoding='utf-8') as f:
+            return f.read()
+    except:
+        # Si falla, retornar un HTML simple
+        return """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>BioEnergy Dashboard</title>
+        </head>
+        <body>
+            <h1>Aplicación en construcción</h1>
+            <p>Los archivos se están cargando...</p>
+        </body>
+        </html>
+        """
 
 # =====================================================
 # GUARDAR CLIENTE
