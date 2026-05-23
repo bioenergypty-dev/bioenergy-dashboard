@@ -533,6 +533,23 @@ AHORRO ECONÓMICO
 <div class="result-card">
 
 <h3>
+
+AHORRO ECONÓMICO ANUAL
+</h3>
+
+<h2 id="ahorroAnual">
+0
+</h2>
+
+<p id="porcentajeAhorro">
+0%
+</p>
+      
+</div>
+      
+<div class="result-card">
+
+<h3>     
 AHORRO 5 AÑOS
 </h3>
 
@@ -828,6 +845,14 @@ function actualizarTodo(){
         ).toFixed(2)
         + "%";
 
+     document.getElementById(
+        "ahorroAnual"
+    ).innerHTML =
+        "$ " +
+        (
+            ahorroUsd * 12
+        ).toFixed(2);
+      
     document.getElementById(
         "ahorro5"
     ).innerHTML =
