@@ -1,0 +1,980 @@
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+
+    <h2>
+        Bienvenido {{ user }}
+    </h2>
+
+    <a href="{{ url_for('logout') }}">
+
+        <button style="
+            padding:10px 15px;
+            background:#dc2626;
+            color:white;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+        ">
+            Cerrar sesión
+        </button>
+
+    </a>
+
+</div>
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>
+BioEnergy Industrial
+</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:Arial,sans-serif;
+
+    background:#f1f1f1;
+
+    padding:0;
+}
+
+.container{
+
+    width:100%;
+}
+
+.header{
+
+    background:#001845;
+
+    color:white;
+
+    padding:20px;
+
+    border-bottom:3px solid #2563eb;
+}
+
+.header-content{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+}
+
+.logo{
+
+    width:65px;
+}
+
+.main{
+
+    padding:20px;
+}
+
+.card{
+
+    background:white;
+
+    border-radius:12px;
+
+    padding:15px;
+
+    margin-bottom:15px;
+
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.client-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(4,1fr);
+
+    gap:10px;
+}
+
+.tarifas{
+
+    display:grid;
+
+    grid-template-columns:
+    1fr 1fr 1fr;
+
+    gap:15px;
+
+    margin-top:15px;
+}
+
+.results{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(4,1fr);
+
+    gap:15px;
+
+    margin-top:20px;
+}
+
+input{
+
+    width:100%;
+
+    padding:10px;
+
+    border-radius:8px;
+
+    border:1px solid #ccc;
+}
+
+.input-money{
+
+    display:flex;
+
+    border:1px solid #ccc;
+
+    border-radius:8px;
+
+    overflow:hidden;
+}
+
+.input-money span{
+
+    padding:10px;
+
+    background:#f3f4f6;
+}
+
+.input-money input{
+
+    border:none;
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+}
+
+table th{
+
+    background:#f3f4f6;
+
+    padding:12px;
+
+    font-size:13px;
+}
+
+table td{
+
+    padding:8px;
+
+    border-bottom:1px solid #eee;
+}
+
+.btn{
+
+    border:none;
+
+    padding:10px 15px;
+
+    border-radius:8px;
+
+    color:white;
+
+    cursor:pointer;
+
+    margin-right:6px;
+
+    margin-top:10px;
+}
+
+.blue{
+    background:#2563eb;
+}
+
+.green{
+    background:#16a34a;
+}
+
+.orange{
+    background:#ea580c;
+}
+
+.red{
+    background:#ef4444;
+}
+
+.purple{
+    background:#9333ea;
+}
+
+.result-card{
+
+    background:white;
+
+    border-radius:12px;
+
+    padding:20px;
+
+    border-left:4px solid #2563eb;
+
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.result-card h2{
+
+    margin-top:12px;
+}
+
+.footer-note{
+
+    background:#eef2ff;
+
+    padding:15px;
+
+    border-radius:10px;
+
+    margin-top:15px;
+}
+
+@media(max-width:900px){
+
+    .client-grid,
+    .tarifas,
+    .results{
+
+        grid-template-columns:1fr;
+    }
+
+    table{
+
+        display:block;
+
+        overflow-x:auto;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container"
+     id="dashboard">
+
+<!-- HEADER -->
+
+<div class="header">
+
+<div class="header-content">
+
+<img src="/static/logo.png"
+     class="logo">
+
+<div>
+
+<h1>
+AHORRO ENERGÉTICO INDUSTRIAL
+</h1>
+
+<p>
+BioEnergy Industrial
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="main">
+
+<!-- CLIENTE -->
+
+<div class="card">
+
+<h2>
+DATOS DEL CLIENTE
+</h2>
+
+<br>
+
+<div class="client-grid">
+
+<input type="text"
+       id="empresa"
+       placeholder="Empresa">
+
+<input type="text"
+       id="contacto"
+       placeholder="Nombre contacto">
+
+<input type="text"
+       id="telefono"
+       placeholder="Teléfono">
+
+<input type="text"
+       id="direccion"
+       placeholder="Dirección">
+
+</div>
+
+</div>
+
+<!-- TARIFAS -->
+
+<div class="tarifas">
+
+<div class="card">
+
+<h3>
+Tarifa kWh ACTUAL
+</h3>
+
+<br>
+
+<div class="input-money">
+
+<span>$</span>
+
+<input type="number"
+       id="tarifaActual"
+       value="0.21"
+       step="0.0001"
+       oninput="actualizarTodo()">
+
+<span>USD</span>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>
+Tarifa kWh PROPUESTA
+</h3>
+
+<br>
+
+<div class="input-money">
+
+<span>$</span>
+
+<input type="number"
+       id="tarifaNueva"
+       value="0.15"
+       step="0.0001"
+       oninput="actualizarTodo()">
+
+<span>USD</span>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>
+Diferencia tarifa
+</h3>
+
+<h1 id="diffTarifa">
+$0
+</h1>
+
+<p>
+Ahorro por kWh
+</p>
+
+</div>
+
+</div>
+
+<!-- TABLA -->
+
+<div class="card">
+
+<h2>
+EQUIPOS / CARGAS ELÉCTRICAS
+</h2>
+
+<br>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>#</th>
+<th>Equipo</th>
+<th>Potencia Actual</th>
+<th>Potencia Nueva</th>
+<th>Horas/día</th>
+<th>Días/mes</th>
+<th>Eliminar</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tbody">
+
+</tbody>
+
+</table>
+
+<button class="btn blue"
+        onclick="agregarFila()">
+
++ Agregar Equipo
+
+</button>
+
+<button class="btn green"
+        onclick="window.print()">
+
+Imprimir
+
+</button>
+
+<button class="btn orange"
+        onclick="guardarPDF()">
+
+Guardar PDF
+
+</button>
+
+<button class="btn purple"
+        onclick="guardarCliente()">
+
+Guardar Cliente
+
+</button>
+
+<button class="btn purple"
+        onclick="window.location.href='/descargar'">
+
+Descargar CSV
+
+</button>
+
+</div>
+
+<!-- RESULTADOS -->
+
+<div class="results">
+
+<div class="result-card">
+
+<h3>
+CONSUMO ACTUAL
+</h3>
+
+<h2 id="consumoActual">
+0
+</h2>
+
+<p id="costoActual">
+$0
+</p>
+
+</div>
+
+<div class="result-card">
+
+<h3>
+CONSUMO PROPUESTO
+</h3>
+
+<h2 id="consumoNuevo">
+0
+</h2>
+
+<p id="costoNuevo">
+$0
+</p>
+
+</div>
+
+<div class="result-card">
+
+<h3>
+AHORRO ENERGÉTICO
+</h3>
+
+<h2 id="ahorroKwh">
+0
+</h2>
+
+<p id="reduccion">
+0%
+</p>
+
+</div>
+
+<div class="result-card">
+
+<h3>
+AHORRO ECONÓMICO
+</h3>
+
+<h2 id="ahorroUsd">
+0
+</h2>
+
+<p id="porcentajeAhorro">
+0%
+</p>
+
+</div>
+
+<div class="result-card">
+
+<h3>
+AHORRO 5 AÑOS
+</h3>
+
+<h2 id="ahorro5">
+0
+</h2>
+
+</div>
+
+<div class="result-card">
+
+<h3>
+AHORRO 10 AÑOS
+</h3>
+
+<h2 id="ahorro10">
+0
+</h2>
+
+</div>
+
+<div class="result-card">
+
+<h3>
+AHORRO 15 AÑOS
+</h3>
+
+<h2 id="ahorro15">
+0
+</h2>
+
+</div>
+
+<div class="result-card">
+
+<h3>
+kWh/MES
+</h3>
+
+<h2 id="kwhMes">
+0
+</h2>
+
+</div>
+
+</div>
+
+<div class="footer-note">
+
+Los cálculos son estimaciones basadas
+en los datos ingresados.
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+window.onload = () => {
+
+    agregarFila(
+        "Motor Principal",
+        2000,
+        2000,
+        10,
+        26
+    );
+}
+
+// =====================================================
+// AGREGAR FILA
+// =====================================================
+
+function agregarFila(
+    nombre="",
+    actual=0,
+    nuevo=0,
+    horas=0,
+    dias=0
+){
+
+    const tbody =
+        document.getElementById("tbody");
+
+    const fila =
+        document.createElement("tr");
+
+    const index =
+        tbody.children.length + 1;
+
+    fila.innerHTML = `
+
+    <td>${index}</td>
+
+    <td>
+    <input type="text"
+           value="${nombre}"
+           oninput="actualizarTodo()">
+    </td>
+
+    <td>
+    <input type="number"
+           class="actual"
+           value="${actual}"
+           oninput="actualizarTodo()">
+    </td>
+
+    <td>
+    <input type="number"
+           class="nuevo"
+           value="${nuevo}"
+           oninput="actualizarTodo()">
+    </td>
+
+    <td>
+    <input type="number"
+           class="horas"
+           value="${horas}"
+           oninput="actualizarTodo()">
+    </td>
+
+    <td>
+    <input type="number"
+           class="dias"
+           value="${dias}"
+           oninput="actualizarTodo()">
+    </td>
+
+    <td>
+    <button class="btn red"
+            onclick="eliminarFila(this)">
+    X
+    </button>
+    </td>
+    `;
+
+    tbody.appendChild(fila);
+
+    actualizarTodo();
+}
+
+// =====================================================
+// ELIMINAR
+// =====================================================
+
+function eliminarFila(btn){
+
+    btn.parentElement.parentElement.remove();
+
+    actualizarTodo();
+}
+
+// =====================================================
+// CALCULOS
+// =====================================================
+
+function actualizarTodo(){
+
+    const tarifaActual =
+        parseFloat(
+            document.getElementById(
+                "tarifaActual"
+            ).value
+        ) || 0;
+
+    const tarifaNueva =
+        parseFloat(
+            document.getElementById(
+                "tarifaNueva"
+            ).value
+        ) || 0;
+
+    document.getElementById(
+        "diffTarifa"
+    ).innerHTML =
+        "$ " +
+        (tarifaActual - tarifaNueva)
+        .toFixed(4);
+
+    let totalActual = 0;
+    let totalNuevo = 0;
+
+    document.querySelectorAll(
+        "#tbody tr"
+    ).forEach(fila => {
+
+        const actual =
+            parseFloat(
+                fila.querySelector(
+                    ".actual"
+                ).value
+            ) || 0;
+
+        const nuevo =
+            parseFloat(
+                fila.querySelector(
+                    ".nuevo"
+                ).value
+            ) || 0;
+
+        const horas =
+            parseFloat(
+                fila.querySelector(
+                    ".horas"
+                ).value
+            ) || 0;
+
+        const dias =
+            parseFloat(
+                fila.querySelector(
+                    ".dias"
+                ).value
+            ) || 0;
+
+        totalActual +=
+            actual * horas * dias;
+
+        totalNuevo +=
+            nuevo * horas * dias;
+    });
+
+    const ahorroKwh =
+        totalActual - totalNuevo;
+
+    const costoActual =
+        totalActual * tarifaActual;
+
+    const costoNuevo =
+        totalNuevo * tarifaNueva;
+
+    const ahorroUsd =
+        costoActual - costoNuevo;
+
+    document.getElementById(
+        "consumoActual"
+    ).innerHTML =
+        totalActual.toFixed(2)
+        + " kWh/mes";
+
+    document.getElementById(
+        "consumoNuevo"
+    ).innerHTML =
+        totalNuevo.toFixed(2)
+        + " kWh/mes";
+
+    document.getElementById(
+        "ahorroKwh"
+    ).innerHTML =
+        ahorroKwh.toFixed(2)
+        + " kWh/mes";
+
+    document.getElementById(
+        "ahorroUsd"
+    ).innerHTML =
+        "$ " +
+        ahorroUsd.toFixed(2);
+
+    document.getElementById(
+        "costoActual"
+    ).innerHTML =
+        "Costo mensual: $"
+        +
+        costoActual.toFixed(2);
+
+    document.getElementById(
+        "costoNuevo"
+    ).innerHTML =
+        "Costo mensual: $"
+        +
+        costoNuevo.toFixed(2);
+
+    document.getElementById(
+        "reduccion"
+    ).innerHTML =
+        "Reducción energética: "
+        +
+        (
+            (ahorroKwh /
+            totalActual) * 100
+        ).toFixed(2)
+        + "%";
+
+    document.getElementById(
+        "porcentajeAhorro"
+    ).innerHTML =
+        "Ahorro económico: "
+        +
+        (
+            (ahorroUsd /
+            costoActual) * 100
+        ).toFixed(2)
+        + "%";
+
+    document.getElementById(
+        "ahorro5"
+    ).innerHTML =
+        "$ " +
+        (
+            ahorroUsd * 12 * 5
+        ).toFixed(2);
+
+    document.getElementById(
+        "ahorro10"
+    ).innerHTML =
+        "$ " +
+        (
+            ahorroUsd * 12 * 10
+        ).toFixed(2);
+
+    document.getElementById(
+        "ahorro15"
+    ).innerHTML =
+        "$ " +
+        (
+            ahorroUsd * 12 * 15
+        ).toFixed(2);
+
+    document.getElementById(
+        "kwhMes"
+    ).innerHTML =
+        totalActual.toFixed(2);
+}
+
+// =====================================================
+// PDF
+// =====================================================
+
+function guardarPDF(){
+
+    const element =
+        document.getElementById(
+            "dashboard"
+        );
+
+    html2pdf()
+    .from(element)
+    .save(
+        "BioEnergy_Report.pdf"
+    );
+}
+
+// =====================================================
+// GUARDAR CLIENTE
+// =====================================================
+
+function guardarCliente(){
+
+    const empresa =
+        document.getElementById(
+            "empresa"
+        ).value;
+
+    const contacto =
+        document.getElementById(
+            "contacto"
+        ).value;
+
+    const telefono =
+        document.getElementById(
+            "telefono"
+        ).value;
+
+    const direccion =
+        document.getElementById(
+            "direccion"
+        ).value;
+
+    fetch("/guardar", {
+
+        method:"POST",
+
+        headers:{
+
+            "Content-Type":
+            "application/json"
+        },
+
+        body:JSON.stringify({
+
+            empresa:empresa,
+
+            contacto:contacto,
+
+            telefono:telefono,
+
+            direccion:direccion,
+
+            cantidad_equipos:1,
+
+            cantidad_kw:0,
+
+            consumo_kwh:0,
+
+            ahorro_mensual:0,
+
+            ahorro_anual:0,
+
+            ahorro_5:0,
+
+            ahorro_10:0,
+
+            ahorro_15:0
+        })
+    })
+
+    .then(
+        response =>
+        response.json()
+    )
+
+    .then(data => {
+
+        alert(data.mensaje);
+    });
+}
+
+</script>
+
+</body>
+</html>
